@@ -103,12 +103,18 @@ impl<'src, T: Resolve> FontCache<'src, T> {
 
     fn populate(&mut self) {
         if let Ok(resources) = self.page.resources() {
-            for (name, &font) in resources.fonts.iter() {
-                if let Ok(font) = self.resolve.get(font) {
-                    self.add_font(name.clone(), font);
-                }
+            // for (name, &font) in resources.fonts.iter() {
+            //     if let Ok(font) = self.resolve.get(font) {
+            //         self.add_font(name.clone(), font);
+            //     }
+            // }
+            for (i, font) in resources.fonts.values().enumerate() {
+                let name = match &&font.name {
+                    Some(name) => name.as_str().into(),
+                    None => i.to_string(),
+                };
+                self.fonts.insert(name, font.clone());
             }
-
             for (font, _) in resources.graphics_states.values().filter_map(|gs| gs.font) {
                 if let Ok(font) = self.resolve.get(font) {
                     if let Some(name) = &font.name {
